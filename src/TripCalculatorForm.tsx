@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Container, Card, Box, Grid, TextField, InputAdornment, Typography } from "@mui/material";
 
+import { kmToNmi } from "./tripCalculationUtil";
+import { calculateFuelEfficiency, calculateGeodesicDistance, calculateTripFuel, calculateTripTime } from "./tripCalculation";
+
 import { CoordSelector } from "./CoordSelector";
 
 const TripCalculatorForm = () => {
@@ -17,9 +20,10 @@ const TripCalculatorForm = () => {
   const [averageKnotSpeed, setAverageKnotSpeed] = useState(15.1);
   const [fuelPerHour, setFuelPerHour] = useState(14.2);
 
-  const distance = 0;
-  const fuelEfficiency = 0;
-  const tripFuel = 0;
+  const distance = calculateGeodesicDistance(startCoord.latitude, startCoord.longitude, endCoord.latitude, endCoord.longitude);
+  const fuelEfficiency = calculateFuelEfficiency(averageKnotSpeed, fuelPerHour);
+  const tripFuel = calculateTripFuel(distance, fuelEfficiency);
+  const tripTime = calculateTripTime(distance, averageKnotSpeed);
 
   const strToFloat = (str: string, prevValue: number): number => {
     const value = parseFloat(str);
@@ -172,10 +176,10 @@ const TripCalculatorForm = () => {
         </Container>
 
         <Typography variant="h2" sx={{ mt: 5 }}>
-          Your trip will take -1 days and -1 hours
+          Your trip will take {tripTime.days} days and {tripTime.hours.toFixed(1)} hours
         </Typography>
         <Typography variant="h2" sx={{ mt: 3 }}>
-          You&#39;ll travel -1nmi ({distance.toFixed(2)}km)
+          You&#39;ll travel {kmToNmi(distance).toFixed(2)}nmi ({distance.toFixed(2)}km)
         </Typography>
         <Typography variant="h2" sx={{ mt: 3 }}>
           You&#39;ll need {tripFuel.toFixed(2)} gallons of fuel

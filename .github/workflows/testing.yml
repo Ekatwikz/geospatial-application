@@ -1,0 +1,55 @@
+name: Repo Tests
+run-name: Running Tests on ${{ github.actor }}'s ${{ github.event_name }} to ${{ github.ref_name }}
+on: [push]
+jobs:
+  paths-filter: # Don't need to run every test job on every push... ?
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      should-test-frontend: ${{ steps.filter.outputs.should-test-frontend }}
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Filter Paths to Test
+      uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          should-test-frontend:
+            - 'src/**'
+  frontend-lint:
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.should-test-frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint Frontend
+        run: npm run lint
+  frontend-typecheck: # Repititive... ??
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.should-test-frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck Frontend
+        run: npm run typecheck
+  frontend-test:
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.should-test-frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Test Frontend
+        run: npx react-scripts test --coverage --verbose
+

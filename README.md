@@ -1,3 +1,9 @@
+# Note:
+- Main logic is in [./src/tripCalculation.ts](https://github.com/Ekatwikz/geospatial-application/blob/main/src/tripCalculation.ts)
+- This project has also been [deployed to vercel](https://geospatial-application-ekatwikz.vercel.app/)
+
+(Auto-generated CRA ReadMe below)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
